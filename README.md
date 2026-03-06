@@ -2,6 +2,12 @@
 
 A lightweight, gesture-driven SwiftUI package for building drag-to-reorder lists with smooth animations and haptic feedback. Built with Swift 6 concurrency in mind.
 
+## Demo
+
+<p align="center">
+  <img src="https://s13.gifyu.com/images/bmSLG.gif" width="300" alt="DraggableList Demo">
+</p>
+
 ## Features
 
 - Long-press or immediate drag activation
