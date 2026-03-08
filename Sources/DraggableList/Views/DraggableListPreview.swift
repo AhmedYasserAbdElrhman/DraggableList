@@ -38,17 +38,25 @@ private struct PreviewTask: DraggableItem {
 @available(iOS 16.0, *)
 struct DraggableListView_Previews: PreviewProvider {
     static var previews: some View {
-        PreviewWrapper()
+        Group {
+            // Preview 1: WITH DragHandle (only handle region activates drag)
+            WithDragHandlePreview()
+                .previewDisplayName("With DragHandle")
+
+            // Preview 2: WITHOUT DragHandle (entire row activates drag)
+            WithoutDragHandlePreview()
+                .previewDisplayName("Full Row Drag")
+        }
     }
 
-    struct PreviewWrapper: View {
+    // MARK: - With DragHandle
+
+    struct WithDragHandlePreview: View {
         @State private var tasks: [PreviewTask] = [
             PreviewTask(title: "Design new feature", subtitle: "Due tomorrow", colorName: "purple"),
             PreviewTask(title: "Code review", subtitle: "PR #142", colorName: "blue"),
             PreviewTask(title: "Write documentation", subtitle: "API guide", colorName: "green"),
             PreviewTask(title: "Fix login bug", subtitle: "Critical", colorName: "red"),
-            PreviewTask(title: "Team standup", subtitle: "10:00 AM", colorName: "orange"),
-            PreviewTask(title: "Deploy to staging", subtitle: "v2.1.0", colorName: "teal"),
         ]
 
         var body: some View {
@@ -72,6 +80,7 @@ struct DraggableListView_Previews: PreviewProvider {
 
                             Spacer()
 
+                            // DragHandle: ONLY this region activates drag
                             DragHandle()
                                 .foregroundColor(.secondary)
                         }
@@ -93,7 +102,59 @@ struct DraggableListView_Previews: PreviewProvider {
                     }
                     .padding()
                 }
-                .navigationTitle("DraggableList")
+                .navigationTitle("DragHandle Mode")
+                .navigationBarTitleDisplayMode(.inline)
+            }
+        }
+    }
+
+    // MARK: - Without DragHandle (full row drag)
+
+    struct WithoutDragHandlePreview: View {
+        @State private var tasks: [PreviewTask] = [
+            PreviewTask(title: "Team standup", subtitle: "10:00 AM", colorName: "orange"),
+            PreviewTask(title: "Deploy to staging", subtitle: "v2.1.0", colorName: "teal"),
+            PreviewTask(title: "Review PRs", subtitle: "3 pending", colorName: "blue"),
+            PreviewTask(title: "Write tests", subtitle: "Coverage: 78%", colorName: "green"),
+        ]
+
+        var body: some View {
+            NavigationView {
+                ScrollView {
+                    DraggableListView(
+                        items: $tasks,
+                        configuration: .immediateDrag
+                    ) { $task, isDragging in
+                        // No DragHandle → entire row is draggable
+                        HStack(spacing: 12) {
+                            Circle()
+                                .fill(task.color)
+                                .frame(width: 10, height: 10)
+
+                            Text(task.title)
+                                .font(.body.weight(.medium))
+
+                            Spacer()
+
+                            Text(task.subtitle)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 14)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(isDragging ? Color(.systemGray5) : Color(.systemBackground))
+                                .shadow(
+                                    color: isDragging ? .black.opacity(0.15) : .black.opacity(0.05),
+                                    radius: isDragging ? 8 : 2,
+                                    y: isDragging ? 4 : 1
+                                )
+                        )
+                    }
+                    .padding()
+                }
+                .navigationTitle("Full Row Mode")
                 .navigationBarTitleDisplayMode(.inline)
             }
         }
